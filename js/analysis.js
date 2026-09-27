@@ -18,6 +18,8 @@ export class Listener {
     this.envelope = []; // [t, rms] every block
     this.floor = 0.004;
     this.recent = [];
+    this.hist = [];
+    this.sinceFloor = 0;
     this.lastOnset = -1;
     this.pending = null;
     this.block = 256;
@@ -67,11 +69,12 @@ export class Listener {
   processBlock(rms, t, start) {
     this.envelope.push([t - this.latency, rms]);
     if (this.envelope.length > 4000) this.envelope.splice(0, 1000);
-    const prevAvg = this.recent.length
-      ? this.recent.reduce((a, b) => a + b, 0) / this.recent.length
-      : rms;
+    // Rise test: the latest ~10 ms against the ~30 ms before it.
+    const prev = this.recent.slice(0, -1);
+    const prevAvg = prev.length ? prev.reduce((a, b) => a + b, 0) / prev.length : rms;
+    const cur = this.recent.length ? (rms + this.recent[this.recent.length - 1]) / 2 : rms;
     this.recent.push(rms);
-    if (this.recent.length > 4) this.recent.shift();
+    if (this.recent.length > 7) this.recent.shift();
 
     // Track the peak level shortly after an onset.
     if (this.pending) {
@@ -84,23 +87,31 @@ export class Listener {
       }
     }
 
-    const isOnset = rms > 0.012
-      && rms > this.floor * 4
-      && rms > prevAvg * 1.9
+    const isOnset = this.hist.length >= 40 // ~0.2 s warm-up to learn the room noise
+      && rms > 0.006
+      && cur > this.floor * 4
+      && cur > prevAvg * 1.8
       && t - this.lastOnset > 0.085;
     if (isOnset) {
       // Refine to the first loud sample in the block.
       const { time } = this.mic;
       let k = 0;
-      const thr = Math.max(prevAvg * 2, 0.01);
+      const thr = Math.max(prevAvg * 2, 0.004);
       for (let i = start; i < start + this.block; i++) {
         if (Math.abs(time[i]) > thr) { k = i - start; break; }
       }
       const raw = t + k / this.sr;
       this.lastOnset = t;
       this.pending = { raw, t: raw - this.latency, level: rms };
-    } else if (rms < this.floor * 2.5) {
-      this.floor = this.floor * 0.98 + rms * 0.02;
+    }
+    // Noise floor: a low percentile of the last ~2 s, so random noise bursts
+    // and the fading ring of a soft strum don't move it much.
+    this.hist.push(rms);
+    if (this.hist.length > 375) this.hist.shift();
+    if (++this.sinceFloor >= 20 && this.hist.length >= 40) {
+      this.sinceFloor = 0;
+      const sorted = [...this.hist].sort((a, b) => a - b);
+      this.floor = Math.max(1e-5, sorted[Math.floor(sorted.length * 0.1)]);
     }
   }
 }
@@ -261,7 +272,12 @@ export function analyseChord(chordName, power, env, onsetT, noiseFloor) {
 
   // Sustain: how long until the sound drops by ~14 dB.
   let sustain = null;
-  const after = env.filter(([t]) => t >= onsetT);
+  // Smooth over ~50 ms so a single dip doesn't count as the sound dying.
+  const raw = env.filter(([t]) => t >= onsetT);
+  const after = raw.map(([t], i) => {
+    const w = raw.slice(Math.max(0, i - 5), i + 5);
+    return [t, w.reduce((a, [, r]) => a + r, 0) / w.length];
+  });
   if (after.length > 20) {
     let peak = 0;
     let peakT = onsetT;
@@ -321,7 +337,7 @@ export function analyseTiming(expected, onsets, { slotDur, bpm }) {
   if (inRange.length < 3) {
     return {
       score: 0, hitRate: 0, meanMs: 0, sdMs: 0, tempo: null,
-      items: [{ kind: 'warn', text: 'I couldn\'t hear much strumming. Check the microphone is allowed and hold the uke closer to the phone.' }],
+      items: [{ kind: 'warn', text: 'I couldn\'t hear much strumming. Check the microphone is allowed, hold the uke closer, or raise Mic sensitivity in Me → Settings.' }],
     };
   }
 

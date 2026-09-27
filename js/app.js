@@ -1,10 +1,10 @@
 // App shell: routing, menus and lesson screens.
 import { CHORDS, STRUMS, SONGS, UNITS, LESSONS, LESSON_BY_ID, BADGES, songChords } from './data.js';
-import { unlockAudio, now, strum, playArpeggio } from './audio.js';
+import { unlockAudio, now, strum, playArpeggio, setMicSensitivity } from './audio.js';
 import { starsFor } from './analysis.js';
 import { h, stars, toast, chordDiagram, patternView } from './ui.js';
 import { createPlayer } from './player.js';
-import { createChordCheck, createTuner, createMetronome, calibrateLatency } from './tools.js';
+import { createChordCheck, createTuner, createMetronome, calibrateLatency, createMicTest } from './tools.js';
 import * as P from './progress.js';
 
 const main = document.getElementById('main');
@@ -12,6 +12,8 @@ const titleEl = document.getElementById('title');
 const backBtn = document.getElementById('back');
 const streakEl = document.getElementById('streak');
 let cleanup = [];
+
+setMicSensitivity(P.getSetting('micSensitivity') ?? 5);
 
 P.onBadge((b) => toast(`<span class="toast-icon">${b.icon}</span> Badge earned: <b>${b.name}</b>`));
 
@@ -316,6 +318,30 @@ function progress() {
     h('a', { class: 'btn wide', href: '#/settings' }, '⚙️ Settings & help'));
 }
 
+function micSensitivityCard() {
+  let level = P.getSetting('micSensitivity') ?? 5;
+  const val = h('span', { class: 'tempo-val' }, String(level));
+  const slider = h('input', {
+    type: 'range', id: 'mic-sens', min: 1, max: 10, step: 1, value: level, 'aria-label': 'Mic sensitivity',
+    onInput: (e) => {
+      level = +e.target.value;
+      val.textContent = String(level);
+      P.setSetting('micSensitivity', level);
+      setMicSensitivity(level);
+    },
+  });
+  const test = createMicTest();
+  cleanup.push(test.destroy);
+  return h('section', { class: 'card' },
+    h('h2', {}, 'Mic sensitivity'),
+    h('p', {}, 'If the coach misses soft strums, turn this up. If it reacts to background noise, turn it down.'),
+    h('div', { class: 'tempo-row' },
+      h('span', { class: 'small-print' }, 'Low'),
+      h('div', { class: 'tempo-mid' }, val, slider),
+      h('span', { class: 'small-print' }, 'High')),
+    test.el);
+}
+
 function stat(icon, n, label) {
   return h('div', { class: 'stat' }, h('div', { class: 'stat-icon' }, icon), h('div', { class: 'stat-n' }, String(n)), h('div', { class: 'stat-label' }, label));
 }
@@ -336,6 +362,7 @@ function settings() {
         h('li', {}, 'Prop the phone up about half a metre from the uke, microphone facing you.'),
         h('li', {}, 'Play somewhere quiet. TV and chatter confuse the coach.'),
         h('li', {}, 'The coach checks timing, speed, steadiness, volume and whether each note rings. It\'s a helper, not a judge, so trust your ears too.'))),
+    micSensitivityCard(),
     h('section', { class: 'card' },
       h('h2', {}, 'Timing calibration'),
       h('p', {}, 'Phones add a small delay between sound and microphone. Calibrate once so timing feedback is fair. Unplug headphones and turn the volume up.'),

@@ -52,7 +52,7 @@ export function createChordCheck(chordName, { onResult } = {}) {
     timer = setTimeout(() => {
       if (onsetT == null) {
         stop();
-        status.textContent = 'I didn\'t hear a strum. Hold the uke closer to the phone and strum a bit louder.';
+        status.textContent = 'I didn\'t hear a strum. Hold the uke closer, or raise Mic sensitivity in Me → Settings.';
       }
     }, 10000);
 
@@ -257,6 +257,65 @@ export function createMetronome() {
     if (performance.now() - started > 30000) earn('metronome');
   }
   return { el, destroy() { if (sched) halt(); stage.destroy(); } };
+}
+
+// ---------- Mic test ----------
+// Live level meter that flashes when a strum is detected.
+export function createMicTest() {
+  const bar = h('div', { class: 'meter-fill' });
+  const mark = h('div', { class: 'meter-mark', title: 'Strums need to get past this line' });
+  const heard = h('div', { class: 'meter-heard' }, '');
+  const btn = h('button', { class: 'btn accent', onClick: toggle }, '🎤 Test with a soft strum');
+  const el = h('div', { class: 'mic-test' },
+    h('div', { class: 'meter' }, bar, mark), heard, h('div', { class: 'btn-row' }, btn));
+  let listener = null;
+  let raf = null;
+  let count = 0;
+  let flashTimer = null;
+
+  async function toggle() {
+    if (listener) { stop(); return; }
+    await unlockAudio();
+    let mic;
+    try {
+      mic = await openMic();
+    } catch (e) {
+      heard.textContent = 'Microphone access is needed for the test.';
+      return;
+    }
+    count = 0;
+    heard.textContent = 'Strum gently. Each strum I hear shows up here.';
+    listener = new Listener(mic, {
+      onOnset: () => {
+        count++;
+        heard.textContent = `Heard it! 🐸 (${count})`;
+        el.classList.add('flash');
+        clearTimeout(flashTimer);
+        flashTimer = setTimeout(() => el.classList.remove('flash'), 250);
+      },
+    });
+    listener.start();
+    btn.textContent = '■ Stop test';
+    // Meter scale: log level from -60 dB to 0 dB.
+    const pct = (rms) => Math.max(0, Math.min(100, ((20 * Math.log10(rms + 1e-6) + 60) / 60) * 100));
+    mark.style.left = pct(0.006) + '%';
+    const loop = () => {
+      raf = requestAnimationFrame(loop);
+      const env = listener?.envelope;
+      if (env?.length) bar.style.width = pct(env[env.length - 1][1]) + '%';
+    };
+    loop();
+  }
+
+  function stop() {
+    listener?.stop();
+    listener = null;
+    cancelAnimationFrame(raf);
+    bar.style.width = '0%';
+    btn.textContent = '🎤 Test with a soft strum';
+  }
+
+  return { el, destroy: stop };
 }
 
 // ---------- Latency calibration ----------

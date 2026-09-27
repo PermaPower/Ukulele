@@ -198,6 +198,17 @@ export class Scheduler {
 // ---------- Microphone ----------
 
 let mic = null;
+let micGainDb = 6;
+
+// Sensitivity 1-10 maps to -6 dB .. +21 dB of boost (3 = no change).
+export function sensitivityToDb(level) {
+  return (level - 3) * 3;
+}
+
+export function setMicSensitivity(level) {
+  micGainDb = sensitivityToDb(level);
+  if (mic) mic.gain.gain.setTargetAtTime(Math.pow(10, micGainDb / 20), getCtx().currentTime, 0.05);
+}
 
 export async function openMic() {
   const c = await unlockAudio();
@@ -212,13 +223,15 @@ export async function openMic() {
   const analyser = c.createAnalyser();
   analyser.fftSize = 8192;
   analyser.smoothingTimeConstant = 0;
-  src.connect(analyser);
+  const gain = c.createGain();
+  gain.gain.value = Math.pow(10, micGainDb / 20);
+  src.connect(gain).connect(analyser);
   // Keep the graph pulled on browsers that skip unconnected nodes.
   const sink = c.createGain();
   sink.gain.value = 0;
   analyser.connect(sink).connect(c.destination);
   mic = {
-    stream, src, analyser,
+    stream, src, gain, analyser,
     time: new Float32Array(analyser.fftSize),
     freqDb: new Float32Array(analyser.frequencyBinCount),
   };
