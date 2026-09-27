@@ -351,8 +351,11 @@ function settings() {
       h('p', { class: 'small-print' }, 'Only turn this on with headphones, or the coach will hear the click instead of you.')),
     h('section', { class: 'card' },
       h('h2', {}, 'Start over'),
-      h('button', { class: 'btn danger', onClick: () => {
-        if (confirm('Reset all lessons, stars and badges?')) { P.resetAll(); location.hash = '#/'; }
+      h('button', { class: 'btn danger', onClick: (e) => {
+        const b = e.currentTarget;
+        if (b.dataset.armed) { P.resetAll(); location.hash = '#/'; return; }
+        b.dataset.armed = '1';
+        b.textContent = 'Tap again to erase all lessons, stars and badges';
       } }, 'Reset my progress')),
     h('p', { class: 'small-print center' }, 'Uke Frog · all songs are traditional or public domain.'));
 }
