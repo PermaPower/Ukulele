@@ -198,14 +198,20 @@ export class Scheduler {
 // ---------- Microphone ----------
 
 let mic = null;
-let micGainDb = 6;
+let micGainDb = 9;
 
 // Sensitivity 1-10 maps to -6 dB .. +21 dB of boost (3 = no change).
 export function sensitivityToDb(level) {
   return (level - 3) * 3;
 }
 
+let micLevel = 6;
+export function getMicSensitivity() {
+  return micLevel;
+}
+
 export function setMicSensitivity(level) {
+  micLevel = level;
   micGainDb = sensitivityToDb(level);
   if (mic) mic.gain.gain.setTargetAtTime(Math.pow(10, micGainDb / 20), getCtx().currentTime, 0.05);
 }

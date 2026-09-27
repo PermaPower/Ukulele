@@ -263,11 +263,10 @@ export function createMetronome() {
 // Live level meter that flashes when a strum is detected.
 export function createMicTest() {
   const bar = h('div', { class: 'meter-fill' });
-  const mark = h('div', { class: 'meter-mark', title: 'Strums need to get past this line' });
   const heard = h('div', { class: 'meter-heard' }, '');
   const btn = h('button', { class: 'btn accent', onClick: toggle }, '🎤 Test with a soft strum');
   const el = h('div', { class: 'mic-test' },
-    h('div', { class: 'meter' }, bar, mark), heard, h('div', { class: 'btn-row' }, btn));
+    h('div', { class: 'meter' }, bar), heard, h('div', { class: 'btn-row' }, btn));
   let listener = null;
   let raf = null;
   let count = 0;
@@ -298,7 +297,6 @@ export function createMicTest() {
     btn.textContent = '■ Stop test';
     // Meter scale: log level from -60 dB to 0 dB.
     const pct = (rms) => Math.max(0, Math.min(100, ((20 * Math.log10(rms + 1e-6) + 60) / 60) * 100));
-    mark.style.left = pct(0.006) + '%';
     const loop = () => {
       raf = requestAnimationFrame(loop);
       const env = listener?.envelope;

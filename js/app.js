@@ -13,7 +13,7 @@ const backBtn = document.getElementById('back');
 const streakEl = document.getElementById('streak');
 let cleanup = [];
 
-setMicSensitivity(P.getSetting('micSensitivity') ?? 5);
+setMicSensitivity(P.getSetting('micSensitivity') ?? 6);
 
 P.onBadge((b) => toast(`<span class="toast-icon">${b.icon}</span> Badge earned: <b>${b.name}</b>`));
 
@@ -319,7 +319,7 @@ function progress() {
 }
 
 function micSensitivityCard() {
-  let level = P.getSetting('micSensitivity') ?? 5;
+  let level = P.getSetting('micSensitivity') ?? 6;
   const val = h('span', { class: 'tempo-val' }, String(level));
   const slider = h('input', {
     type: 'range', id: 'mic-sens', min: 1, max: 10, step: 1, value: level, 'aria-label': 'Mic sensitivity',
@@ -334,7 +334,7 @@ function micSensitivityCard() {
   cleanup.push(test.destroy);
   return h('section', { class: 'card' },
     h('h2', {}, 'Mic sensitivity'),
-    h('p', {}, 'If the coach misses soft strums, turn this up. If it reacts to background noise, turn it down.'),
+    h('p', {}, 'If the coach misses strums, turn this up. If it hears strums when you aren\'t playing, turn it down.'),
     h('div', { class: 'tempo-row' },
       h('span', { class: 'small-print' }, 'Low'),
       h('div', { class: 'tempo-mid' }, val, slider),

@@ -1,7 +1,7 @@
 // Listening and coaching: onset detection, pitch detection, chord recognition
 // and the heuristics that turn measurements into friendly feedback.
 import { CHORDS, noteName } from './data.js';
-import { getCtx } from './audio.js';
+import { getCtx, getMicSensitivity } from './audio.js';
 
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
 
@@ -51,10 +51,14 @@ export class Listener {
     while (from + B <= nowSample) {
       const start = N - (nowSample - from);
       let sum = 0;
-      for (let i = start; i < start + B; i++) sum += time[i] * time[i];
-      const rms = Math.sqrt(sum / B);
-      const t = from / this.sr;
-      this.processBlock(rms, t, start);
+      let hsum = 0;
+      for (let i = start; i < start + B; i++) {
+        sum += time[i] * time[i];
+        // First difference emphasises the bright attack of a strum over ringing notes.
+        const d = time[i] - time[i - 1];
+        hsum += d * d;
+      }
+      this.processBlock(Math.sqrt(sum / B), Math.sqrt(hsum / B), from / this.sr, start);
       from += B;
     }
     this.lastSample = from;
@@ -66,14 +70,25 @@ export class Listener {
     }
   }
 
-  processBlock(rms, t, start) {
+  // Detection thresholds from the Mic sensitivity setting (1 = strict, 10 = very sensitive).
+  thresholds() {
+    const L = Math.max(1, Math.min(10, getMicSensitivity()));
+    const f = (L - 1) / 9;
+    return {
+      rise: 2.4 - f * 1.1, // attack must jump this much above the last ~30 ms
+      gate: 6 - f * 4, // and sit this far above the background noise
+    };
+  }
+
+  processBlock(rms, hf, t, start) {
     this.envelope.push([t - this.latency, rms]);
     if (this.envelope.length > 4000) this.envelope.splice(0, 1000);
-    // Rise test: the latest ~10 ms against the ~30 ms before it.
+
+    // Rise test on the attack signal: latest ~10 ms against the ~30 ms before it.
     const prev = this.recent.slice(0, -1);
-    const prevAvg = prev.length ? prev.reduce((a, b) => a + b, 0) / prev.length : rms;
-    const cur = this.recent.length ? (rms + this.recent[this.recent.length - 1]) / 2 : rms;
-    this.recent.push(rms);
+    const prevAvg = prev.length ? prev.reduce((a, b) => a + b, 0) / prev.length : hf;
+    const cur = this.recent.length ? (hf + this.recent[this.recent.length - 1]) / 2 : hf;
+    this.recent.push(hf);
     if (this.recent.length > 7) this.recent.shift();
 
     // Track the peak level shortly after an onset.
@@ -87,31 +102,32 @@ export class Listener {
       }
     }
 
+    const th = this.thresholds();
     const isOnset = this.hist.length >= 40 // ~0.2 s warm-up to learn the room noise
-      && rms > 0.006
-      && cur > this.floor * 4
-      && cur > prevAvg * 1.8
+      && cur > 0.0005
+      && cur > this.floor * th.gate
+      && cur > prevAvg * th.rise
       && t - this.lastOnset > 0.085;
     if (isOnset) {
-      // Refine to the first loud sample in the block.
+      // Refine to the first sharp change in the latest two blocks.
       const { time } = this.mic;
-      let k = 0;
-      const thr = Math.max(prevAvg * 2, 0.004);
-      for (let i = start; i < start + this.block; i++) {
-        if (Math.abs(time[i]) > thr) { k = i - start; break; }
+      const s0 = Math.max(1, start - this.block);
+      const thr = Math.max(prevAvg * 2, cur * 0.5);
+      let k = start - s0;
+      for (let i = s0; i < start + this.block; i++) {
+        if (Math.abs(time[i] - time[i - 1]) > thr) { k = i - s0; break; }
       }
-      const raw = t + k / this.sr;
+      const raw = t - (start - s0) / this.sr + k / this.sr;
       this.lastOnset = t;
       this.pending = { raw, t: raw - this.latency, level: rms };
     }
-    // Noise floor: a low percentile of the last ~2 s, so random noise bursts
-    // and the fading ring of a soft strum don't move it much.
-    this.hist.push(rms);
+    // Background noise: a low percentile of the attack signal over the last ~2 s.
+    this.hist.push(hf);
     if (this.hist.length > 375) this.hist.shift();
     if (++this.sinceFloor >= 20 && this.hist.length >= 40) {
       this.sinceFloor = 0;
       const sorted = [...this.hist].sort((a, b) => a - b);
-      this.floor = Math.max(1e-5, sorted[Math.floor(sorted.length * 0.1)]);
+      this.floor = Math.max(1e-6, sorted[Math.floor(sorted.length * 0.1)]);
     }
   }
 }
