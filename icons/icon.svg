@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#22a55a"/>
+  <g stroke="#f4e3c3" stroke-width="10" opacity="0.9">
+    <line x1="40" y1="370" x2="472" y2="370"/><line x1="40" y1="398" x2="472" y2="398"/>
+    <line x1="40" y1="426" x2="472" y2="426"/><line x1="40" y1="454" x2="472" y2="454"/>
+  </g>
+  <ellipse cx="256" cy="362" rx="120" ry="22" fill="#178045"/>
+  <ellipse cx="175" cy="330" rx="46" ry="30" fill="#2a8f45"/>
+  <ellipse cx="337" cy="330" rx="46" ry="30" fill="#2a8f45"/>
+  <ellipse cx="256" cy="270" rx="120" ry="94" fill="#6fe08b"/>
+  <ellipse cx="256" cy="302" rx="72" ry="50" fill="#dcfbd0"/>
+  <circle cx="196" cy="180" r="46" fill="#6fe08b"/><circle cx="316" cy="180" r="46" fill="#6fe08b"/>
+  <circle cx="196" cy="180" r="30" fill="#fff"/><circle cx="316" cy="180" r="30" fill="#fff"/>
+  <circle cx="204" cy="184" r="15" fill="#111"/><circle cx="324" cy="184" r="15" fill="#111"/>
+  <path d="M206 262 Q256 306 306 262" fill="none" stroke="#14532d" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="178" cy="262" r="15" fill="#ff8f8f" opacity="0.7"/><circle cx="334" cy="262" r="15" fill="#ff8f8f" opacity="0.7"/>
+</svg>

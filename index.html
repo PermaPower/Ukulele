@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Uke Frog</title>
+  <meta name="description" content="Learn ukulele chords, strumming and songs with Freddie the frog and a listening coach.">
+  <meta name="theme-color" content="#22a55a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Uke Frog">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <button id="back" class="icon-btn" aria-label="Back" hidden>‹</button>
+    <div id="title" class="title">Uke Frog</div>
+    <div id="streak" class="streak-pill">🔥 0</div>
+  </header>
+  <main id="main" tabindex="-1"></main>
+  <nav class="tabbar" aria-label="Sections">
+    <a href="#/" data-tab="home"><span>🏠</span>Home</a>
+    <a href="#/plan" data-tab="plan"><span>🗺️</span>Lessons</a>
+    <a href="#/tuner" data-tab="tuner"><span>🎯</span>Tuner</a>
+    <a href="#/metronome" data-tab="metronome"><span>⏱️</span>Metronome</a>
+    <a href="#/progress" data-tab="progress"><span>🏅</span>Me</a>
+  </nav>
+  <noscript>Uke Frog needs JavaScript turned on.</noscript>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
