@@ -171,8 +171,12 @@ export const STRUMS = {
   },
 };
 
-// A bar is { c: chord or [chord, chord], l: lyric }. Two chords split the bar evenly.
+// A bar is { c: chord or [chord, chord], l: lyric, p: optional strum pattern for this bar }.
+// Two chords split the bar evenly.
 // Songs with lyrics are traditional or public domain; arrangements are simplified for beginners.
+// Hit the Road Jack: F gets down + chuck, E7 gets up, up, down.
+const FE7 = 'D.X.UUD.';
+
 export const SONGS = {
   row: {
     id: 'row', title: 'Row, Row, Row Your Boat', strum: 'down4', bpm: 60, beats: 4,
@@ -339,26 +343,27 @@ export const SONGS = {
   },
   // Under copyright, so no lyrics: bars carry section cues and you sing from memory.
   jack: {
+    extraPatterns: [{ label: 'F → E7 bars', pattern: FE7 }],
     id: 'jack', title: 'Hit the Road Jack', strum: 'chuck', bpm: 90, beats: 4,
     noLyrics: true,
-    blurb: 'The famous walk-down: Am, G, F, E7, two beats each. Down strum on each chord, chuck in between. Lyrics aren\'t included because the song is under copyright, so sing it from memory.',
+    blurb: 'The famous walk-down: Am, G, F, E7, two beats each. Am, G and F get a down strum then a chuck. On E7 strum up, up, down. Lyrics aren\'t included because the song is under copyright, so sing it from memory.',
     bars: [
       { c: ['Am', 'G'], l: 'Chorus · line 1' },
-      { c: ['F', 'E7'], l: '' },
+      { c: ['F', 'E7'], l: '', p: FE7 },
       { c: ['Am', 'G'], l: 'Chorus · line 2' },
-      { c: ['F', 'E7'], l: '' },
+      { c: ['F', 'E7'], l: '', p: FE7 },
       { c: ['Am', 'G'], l: 'Chorus · line 3' },
-      { c: ['F', 'E7'], l: '' },
+      { c: ['F', 'E7'], l: '', p: FE7 },
       { c: ['Am', 'G'], l: 'Chorus · line 4' },
-      { c: ['F', 'E7'], l: '' },
+      { c: ['F', 'E7'], l: '', p: FE7 },
       { c: ['Am', 'G'], l: 'Verse · line 1' },
-      { c: ['F', 'E7'], l: '' },
+      { c: ['F', 'E7'], l: '', p: FE7 },
       { c: ['Am', 'G'], l: 'Verse · line 2' },
-      { c: ['F', 'E7'], l: '' },
+      { c: ['F', 'E7'], l: '', p: FE7 },
       { c: ['Am', 'G'], l: 'Verse · line 3' },
-      { c: ['F', 'E7'], l: '' },
+      { c: ['F', 'E7'], l: '', p: FE7 },
       { c: ['Am', 'G'], l: 'Verse · line 4' },
-      { c: ['F', 'E7'], l: '' },
+      { c: ['F', 'E7'], l: '', p: FE7 },
       { c: 'Am', l: 'Finish on Am' },
     ],
   },

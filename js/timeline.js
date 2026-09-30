@@ -54,7 +54,7 @@ export class Timeline {
     const within = s % this.slotsPerBar;
     const bar = this.barAt(s);
     if (within % 2 === 0) out.push({ kind: 'beat', t, accent: within === 0, bar, beat: within / 2 });
-    const p = this.pattern[within];
+    const p = (this.bars[bar]?.p || this.pattern)[within];
     if (p && p !== '.') out.push({ kind: 'strum', t, type: p, chord: this.chordAtSlot(s), bar, slot: s });
     return out;
   }

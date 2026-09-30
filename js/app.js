@@ -238,7 +238,8 @@ function songLesson(l, bump) {
     h('p', {}, 'Chords in this song:'),
     h('div', { class: 'chord-row' }, ...used.map((c) => chordDiagram(c, { size: 'sm' }))),
     h('p', {}, `Strum: ${strumDef.name} · ${song.beats}/4 time · ${song.bpm} BPM`),
-    patternView(strumDef.pattern, strumDef.beats)));
+    patternView(strumDef.pattern, strumDef.beats),
+    ...(song.extraPatterns || []).flatMap((x) => [h('p', {}, x.label + ':'), patternView(x.pattern, song.beats)])));
   const player = createPlayer({
     id: l.id, bars: song.bars, pattern: strumDef.pattern, beats: song.beats, bpm: song.bpm,
     minBpm: 40, maxBpm: song.bpm + 40, lyrics: true, onResult: bump,
