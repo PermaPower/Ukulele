@@ -75,8 +75,8 @@ function home() {
         h('div', {}, h('div', { class: 'cc-title' }, 'You finished every lesson!'), h('div', { class: 'cc-sub' }, 'Replay songs to earn more stars.'))),
     h('nav', { class: 'menu-grid', 'aria-label': 'Main menu' },
       tile('#/plan', '🗺️', 'Lesson Plan', 'Step by step'),
-      tile('#/chords', '✋', 'Chord Book', '10 chords'),
-      tile('#/songs', '🎵', 'Song Book', '10 songs'),
+      tile('#/chords', '✋', 'Chord Book', `${Object.keys(CHORDS).length} chords`),
+      tile('#/songs', '🎵', 'Song Book', `${Object.keys(SONGS).length} songs`),
       tile('#/tuner', '🎯', 'Tuner', 'Tune up'),
       tile('#/metronome', '⏱️', 'Metronome', 'Keep time'),
       tile('#/progress', '🏅', 'My Progress', 'Badges & stars')),
@@ -384,7 +384,7 @@ function settings() {
         b.dataset.armed = '1';
         b.textContent = 'Tap again to erase all lessons, stars and badges';
       } }, 'Reset my progress')),
-    h('p', { class: 'small-print center' }, 'Uke Frog · all songs are traditional or public domain.'));
+    h('p', { class: 'small-print center' }, 'Uke Frog · lyrics are shown only for traditional and public-domain songs.'));
 }
 
 render();

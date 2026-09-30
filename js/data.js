@@ -96,6 +96,14 @@ export const CHORDS = {
       'Let the E and A strings ring open.',
     ],
   },
+  E7: {
+    name: 'E7', full: 'E dominant 7th', frets: [1, 2, 0, 2], fingers: [1, 2, 0, 3],
+    tips: [
+      'Index on the 1st fret of the G string, middle on the 2nd fret of the C string, ring on the 2nd fret of the A string.',
+      'The E string rings open, right in the middle of the shape.',
+      'E7 is tense and bluesy. It wants to pull back to Am.',
+    ],
+  },
 };
 
 // Pitch classes and exact string frequencies for each chord.
@@ -164,7 +172,7 @@ export const STRUMS = {
 };
 
 // A bar is { c: chord or [chord, chord], l: lyric }. Two chords split the bar evenly.
-// All songs are traditional or public domain; arrangements are simplified for beginners.
+// Songs with lyrics are traditional or public domain; arrangements are simplified for beginners.
 export const SONGS = {
   row: {
     id: 'row', title: 'Row, Row, Row Your Boat', strum: 'down4', bpm: 60, beats: 4,
@@ -329,6 +337,31 @@ export const SONGS = {
       { c: 'D', l: 'Clementine.' },
     ],
   },
+  // Under copyright, so no lyrics: bars carry section cues and you sing from memory.
+  jack: {
+    id: 'jack', title: 'Hit the Road Jack', strum: 'chuck', bpm: 90, beats: 4,
+    noLyrics: true,
+    blurb: 'The famous walk-down: Am, G, F, E7, two beats each. Down strum on each chord, chuck in between. Lyrics aren\'t included because the song is under copyright, so sing it from memory.',
+    bars: [
+      { c: ['Am', 'G'], l: 'Chorus · line 1' },
+      { c: ['F', 'E7'], l: '' },
+      { c: ['Am', 'G'], l: 'Chorus · line 2' },
+      { c: ['F', 'E7'], l: '' },
+      { c: ['Am', 'G'], l: 'Chorus · line 3' },
+      { c: ['F', 'E7'], l: '' },
+      { c: ['Am', 'G'], l: 'Chorus · line 4' },
+      { c: ['F', 'E7'], l: '' },
+      { c: ['Am', 'G'], l: 'Verse · line 1' },
+      { c: ['F', 'E7'], l: '' },
+      { c: ['Am', 'G'], l: 'Verse · line 2' },
+      { c: ['F', 'E7'], l: '' },
+      { c: ['Am', 'G'], l: 'Verse · line 3' },
+      { c: ['F', 'E7'], l: '' },
+      { c: ['Am', 'G'], l: 'Verse · line 4' },
+      { c: ['F', 'E7'], l: '' },
+      { c: 'Am', l: 'Finish on Am' },
+    ],
+  },
   saints: {
     id: 'saints', title: 'When the Saints Go Marching In', strum: 'island', bpm: 110, beats: 4,
     blurb: 'The grand finale: island strum at full speed.',
@@ -367,6 +400,7 @@ export const UNITS = [
   { title: 'Unit 8', lessons: [{ type: 'chord', chord: 'D' }, { type: 'song', song: 'kumbaya' }] },
   { title: 'Unit 9', lessons: [{ type: 'chord', chord: 'A7' }, { type: 'song', song: 'clementine' }] },
   { title: 'Unit 10', lessons: [{ type: 'chord', chord: 'A' }, { type: 'song', song: 'saints' }] },
+  { title: 'Unit 11', lessons: [{ type: 'chord', chord: 'E7' }, { type: 'song', song: 'jack' }] },
 ];
 
 // Flatten into an ordered list with ids, titles and "chords known so far".
@@ -415,12 +449,12 @@ export const BADGES = [
   { id: 'tuned', icon: '🎯', name: 'Tuned Up', desc: 'Tuned all four strings.' },
   { id: 'first-chord', icon: '✋', name: 'First Chord', desc: 'Finished your first chord lesson.' },
   { id: 'five-chords', icon: '🖐️', name: 'Handful', desc: 'Learnt 5 chords.' },
-  { id: 'all-chords', icon: '🏅', name: 'Chord Master', desc: 'Learnt all 10 chords.' },
+  { id: 'all-chords', icon: '🏅', name: 'Chord Master', desc: 'Learnt every chord.' },
   { id: 'first-strum', icon: '🌊', name: 'Strummer', desc: 'Finished a strumming lesson.' },
   { id: 'all-strums', icon: '🏝️', name: 'Island Groove', desc: 'Finished every strumming lesson.' },
   { id: 'first-song', icon: '🎵', name: 'First Song', desc: 'Played your first song.' },
   { id: 'five-songs', icon: '📜', name: 'Set List', desc: 'Played 5 songs.' },
-  { id: 'all-songs', icon: '🎤', name: 'Headliner', desc: 'Played all 10 songs.' },
+  { id: 'all-songs', icon: '🎤', name: 'Headliner', desc: 'Played every song.' },
   { id: 'three-stars', icon: '⭐', name: 'Three Stars', desc: 'Scored 3 stars on a lesson.' },
   { id: 'coached', icon: '👂', name: 'Good Listener', desc: 'Got feedback from the coach.' },
   { id: 'metronome', icon: '⏱️', name: 'Keeping Time', desc: 'Practised with the metronome.' },

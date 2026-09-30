@@ -75,7 +75,9 @@ export function createPlayer({ id, bars, pattern, beats, bpm, minBpm = 40, maxBp
     bars.forEach((b) => [].concat(b.c).forEach((c) => flat.push(c)));
     let pos = 0;
     for (let i = 0; i < Math.max(0, barIdx); i++) pos += [].concat(bars[i].c).length;
-    for (let i = pos; i < flat.length; i++) if (flat[i] !== cur) { nxt = flat[i]; break; }
+    // Skip to the current chord within this bar, then find the next different one.
+    const at = flat.indexOf(cur, pos);
+    for (let i = at < 0 ? pos : at; i < flat.length; i++) if (flat[i] !== cur) { nxt = flat[i]; break; }
     if (cur && cur !== lastChord) {
       curBox.replaceChildren(chordDiagram(cur, { size: 'sm' }));
       lastChord = cur;
