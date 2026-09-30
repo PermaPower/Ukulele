@@ -1,5 +1,5 @@
 // Offline support: cache the app shell, serve cache first, refresh in the background.
-const CACHE = 'ukefrog-v4';
+const CACHE = 'ukefrog-v5';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/styles.css',
   'js/app.js', 'js/data.js', 'js/audio.js', 'js/analysis.js', 'js/timeline.js',

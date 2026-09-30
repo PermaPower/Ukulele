@@ -400,7 +400,8 @@ export const UNITS = [
   { title: 'Unit 8', lessons: [{ type: 'chord', chord: 'D' }, { type: 'song', song: 'kumbaya' }] },
   { title: 'Unit 9', lessons: [{ type: 'chord', chord: 'A7' }, { type: 'song', song: 'clementine' }] },
   { title: 'Unit 10', lessons: [{ type: 'chord', chord: 'A' }, { type: 'song', song: 'saints' }] },
-  { title: 'Unit 11', lessons: [{ type: 'chord', chord: 'E7' }, { type: 'song', song: 'jack' }] },
+  // Bonus lessons are always open, whatever you've finished.
+  { title: 'Bonus', open: true, lessons: [{ type: 'chord', chord: 'E7' }, { type: 'song', song: 'jack' }] },
 ];
 
 // Flatten into an ordered list with ids, titles and "chords known so far".
@@ -409,7 +410,7 @@ export const LESSONS = [];
   const known = [];
   UNITS.forEach((u, ui) => {
     u.lessons.forEach((l) => {
-      const lesson = { ...l, unit: ui, unitTitle: u.title };
+      const lesson = { ...l, unit: ui, unitTitle: u.title, alwaysOpen: !!u.open };
       if (l.type === 'tune') {
         lesson.id = 'tune';
         lesson.title = 'Tune your ukulele';

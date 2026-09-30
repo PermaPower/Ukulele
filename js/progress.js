@@ -66,7 +66,7 @@ export function completeLesson(id, stars) {
 export function isUnlocked(id) {
   const l = LESSONS.find((x) => x.id === id);
   if (!l) return false;
-  if (l.index === 0) return true;
+  if (l.index === 0 || l.alwaysOpen) return true;
   return isDone(LESSONS[l.index - 1].id);
 }
 

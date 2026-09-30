@@ -4,11 +4,11 @@ A ukulele learning app for your phone. Freddie the frog hops along the strings i
 
 ## What's inside
 
-- **Lesson plan**: 28 lessons in 11 units, from easy to harder. Each unit teaches a chord, sometimes a strum, then a song that uses only the chords you know. Finish a lesson to unlock the next.
+- **Lesson plan**: 26 lessons in 10 units plus an always-open bonus unit, from easy to harder. Each unit teaches a chord, sometimes a strum, then a song that uses only the chords you know. Finish a lesson to unlock the next.
 - **11 chords**: C, G7, F, G, Am, Dm, Em, D, A7, A, E7. Each has a diagram, finger tips, sound samples, a chord check and a chord-change drill.
 - **5 strums**: steady downs, down-up, waltz (3/4), the chuck, and the island strum.
 - **10 songs** (traditional or public domain): Row Row Row Your Boat, Skip to My Lou, Oh! Susanna, Amazing Grace, Drunken Sailor, Jingle Bells, Auld Lang Syne, Kumbaya, Clementine, When the Saints Go Marching In. Lyrics highlight as you play and the tempo is adjustable.
-- **Bonus song**: Hit the Road Jack (Am, G, F, E7 with the chuck strum). It's under copyright, so the chart shows chords and section cues without lyrics.
+- **Bonus unit** (always open): E7 chord and Hit the Road Jack (Am, G, F, E7 with the chuck strum). It's under copyright, so the chart shows chords and section cues without lyrics.
 - **Listening coach** (uses the microphone):
   - Chord check: which strings ring clearly, which are muffled or ringing open, whether it sounded like a different chord, and how long the chord sustains.
   - Rhythm and songs: strums hit, rushing or dragging, steadiness, your actual tempo, speeding up or slowing down, extra strums, quiet up-strums, uneven volume, and chord clarity through the song.
