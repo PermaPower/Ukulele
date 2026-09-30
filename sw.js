@@ -1,6 +1,6 @@
 // Offline support. Online: always fetch the latest files (bypassing the
 // browser's HTTP cache) and keep a copy. Offline: serve the saved copy.
-const CACHE = 'ukefrog-v7';
+const CACHE = 'ukefrog-v8';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/styles.css',
   'js/app.js', 'js/data.js', 'js/audio.js', 'js/analysis.js', 'js/timeline.js',
@@ -26,7 +26,7 @@ self.addEventListener('fetch', (e) => {
   e.respondWith((async () => {
     const cache = await caches.open(CACHE);
     try {
-      const res = await fetch(req, { cache: 'no-cache' });
+      const res = await fetch(req.mode === 'navigate' ? req.url : req, { cache: 'no-cache' });
       if (res.ok) cache.put(req, res.clone());
       return res;
     } catch (err) {

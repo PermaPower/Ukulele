@@ -1,5 +1,5 @@
 // The play-along / listen-and-coach player used by chord drills, strum lessons and songs.
-import { unlockAudio, now, Scheduler, strum, click, openMic, defaultLatency } from './audio.js';
+import { unlockAudio, now, Scheduler, strum, click, openMic, closeMic, defaultLatency } from './audio.js';
 import { Timeline } from './timeline.js';
 import { FrogStage } from './frog.js';
 import { Listener, analyseTiming, analyseSongChords, newSpectrumAccumulator, addSpectrum, starsFor } from './analysis.js';
@@ -169,6 +169,7 @@ export function createPlayer({ id, bars, pattern, beats, bpm, minBpm = 40, maxBp
     mode = null;
     sched?.stop();
     listener?.stop();
+    if (m === 'listen') closeMic();
     clearInterval(uiTimer);
     clearTimeout(endTimer);
     keepAwake(false);

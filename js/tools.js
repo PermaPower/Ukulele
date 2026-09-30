@@ -1,6 +1,6 @@
 // Chord checker, tuner, metronome and latency calibration.
 import { STRINGS } from './data.js';
-import { unlockAudio, now, openMic, click, playReference, Scheduler, getCtx } from './audio.js';
+import { unlockAudio, now, openMic, closeMic, click, playReference, Scheduler, getCtx } from './audio.js';
 import { Listener, detectPitch, analyseChord, newSpectrumAccumulator, addSpectrum, starsFor, describePitch } from './analysis.js';
 import { Timeline } from './timeline.js';
 import { FrogStage } from './frog.js';
@@ -26,7 +26,7 @@ export function createChordCheck(chordName, { onResult } = {}) {
       status.textContent = 'I need microphone access to listen. Allow it in your browser settings, then try again.';
       return;
     }
-    stop();
+    stop(false);
     btn.disabled = true;
     results.replaceChildren();
     status.textContent = 'Listening… strum the chord now!';
@@ -80,15 +80,16 @@ export function createChordCheck(chordName, { onResult } = {}) {
     }
   }
 
-  function stop() {
+  function stop(release = true) {
     listener?.stop();
     listener = null;
     clearTimeout(timer);
     btn.disabled = false;
     el.classList.remove('listening');
+    if (release) closeMic();
   }
 
-  return { el, destroy: stop };
+  return { el, destroy: () => stop() };
 }
 
 // ---------- Tuner ----------
@@ -182,6 +183,7 @@ export function createTuner({ onAllTuned } = {}) {
     cancelAnimationFrame(raf);
     raf = null;
     startBtn.textContent = '🎤 Start tuner';
+    closeMic();
   }
 
   return { el, destroy: stop, allTuned: () => tuned.every(Boolean) };
@@ -309,6 +311,7 @@ export function createMicTest() {
     listener?.stop();
     listener = null;
     cancelAnimationFrame(raf);
+    closeMic();
     bar.style.width = '0%';
     btn.textContent = '🎤 Test with a soft strum';
   }
@@ -333,6 +336,7 @@ export async function calibrateLatency(statusEl) {
   listener.start();
   await new Promise((r) => setTimeout(r, (t0 - now() + 4.3) * 1000));
   listener.stop();
+  closeMic();
   const delays = [];
   for (const c of clicks) {
     const o = listener.onsets.find((x) => x.t - c > -0.01 && x.t - c < 0.35);

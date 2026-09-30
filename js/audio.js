@@ -19,10 +19,29 @@ export function getCtx() {
   return ctx;
 }
 
+// iPhone (iOS 16.4+): 'playback' ignores the silent switch and uses the loudspeaker;
+// 'play-and-record' is needed while the mic is on.
+function setSessionType(type) {
+  try { if (navigator.audioSession) navigator.audioSession.type = type; } catch (e) { /* unsupported */ }
+}
+
 // Must be called from a user gesture on iOS.
 export async function unlockAudio() {
-  const c = getCtx();
-  if (c.state !== 'running') await c.resume();
+  if (!mic) setSessionType('playback');
+  let c = getCtx();
+  if (c.state !== 'running') {
+    // resume() can hang on an interrupted context (after a call or app switch).
+    await Promise.race([c.resume().catch(() => {}), new Promise((r) => setTimeout(r, 800))]);
+  }
+  if (c.state !== 'running') {
+    // Still stuck: start a fresh audio engine.
+    closeMic();
+    try { c.close(); } catch (e) { /* ignore */ }
+    ctx = null;
+    stringVoices.fill(null);
+    c = getCtx();
+    await Promise.race([c.resume().catch(() => {}), new Promise((r) => setTimeout(r, 800))]);
+  }
   return c;
 }
 
@@ -222,6 +241,7 @@ export async function openMic() {
   if (!navigator.mediaDevices?.getUserMedia) {
     throw new Error('This browser can\'t use the microphone. Open the app over https in Safari or Chrome.');
   }
+  setSessionType('play-and-record');
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
   });
@@ -249,6 +269,8 @@ export function closeMic() {
   mic.stream.getTracks().forEach((t) => t.stop());
   try { mic.src.disconnect(); } catch (e) { /* ignore */ }
   mic = null;
+  // Hand the sound back to the loudspeaker (iPhones use the earpiece while recording).
+  setSessionType('playback');
 }
 
 // Round-trip latency estimate (speaker -> mic). Refined by calibration.
